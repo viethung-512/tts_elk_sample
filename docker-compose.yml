@@ -127,6 +127,8 @@ services:
       - '3001:3001'
     volumes:
       - '$PWD/data/tts_static:/app/public'
+    networks:
+      - tts
 networks:
   tts:
     driver: bridge
