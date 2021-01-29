@@ -22,7 +22,7 @@ services:
         max-size: '10m'
         max-file: '50'
     networks:
-      - elk
+      - tts
   kibana:
     container_name: kibana
     image: kibana:${ELK_VERSION}
@@ -44,7 +44,7 @@ services:
         max-size: '10m'
         max-file: '50'
     networks:
-      - elk
+      - tts
   logstash:
     container_name: logstash
     image: logstash:${ELK_VERSION}
@@ -69,7 +69,35 @@ services:
         max-size: '10m'
         max-file: '50'
     networks:
-      - elk
+      - tts
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    ports:
+      - '27017:27017'
+    volumes:
+      - '$PWD/data/mongodb-data:/data/db:z'
+      - '$PWD/configs/mongod.conf:/etc/mongod.conf:z'
+    networks:
+      - tts
+  redis:
+    image: 'redis:alpine'
+    container_name: redis
+    command: redis-server --requirepass ${REDIS_SERVER_PASSWORD}
+    ports:
+      - '6379:6379'
+    volumes:
+      - '$PWD/data/redis-data:/var/lib/redis:z'
+      - '$PWD/redis.conf:/usr/local/etc/redis/redis.conf:z'
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    networks:
+      - tts
+volumes:
+  mongodb_data:
 networks:
-  elk:
+  tts:
     driver: bridge
